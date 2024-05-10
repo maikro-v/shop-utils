@@ -1,1 +1,0 @@
-import{_ as t,c as o,b as s,w as n,d as a,r as c,o as _,e as r}from"./index-B0yx7PZy.js";const d={class:"page"},p=a({name:"Index"}),i=Object.assign(p,{setup(l){return(f,m)=>{const e=c("router-link");return _(),o("div",d,[s(e,{to:"/join-words"},{default:n(()=>[r("快速组词")]),_:1})])}}}),x=t(i,[["__scopeId","data-v-f02fcb69"]]);export{x as default};
