@@ -26,25 +26,23 @@
                 <div>开头固定词</div>
                 <textarea name="startingWord" rows="6" class="textarea" oninput="saveStorey()"></textarea>
             </label>
-            </div>
-                <div>主词</div>
-                <label>
-                    <input type="radio" name="position" value="0" checked oninput="saveStorey()" />
-                    开头位置
-                </label>
-                <label>
-                    <input type="radio" name="position" value="1" oninput="saveStorey()" />
-                    中间位置
-                </label>
-                <label>
-                    <input type="radio" name="position" value="2" oninput="saveStorey()" />
-                    结尾位置
-                </label>
-                <label>
-                    <input type="radio" name="position" value="3" oninput="saveStorey()" />
-                    随机位置
-                </label>
-            </div>
+            <div>主词</div>
+            <label>
+                <input type="radio" name="position" value="0" checked oninput="saveStorey()" />
+                开头位置
+            </label>
+            <label>
+                <input type="radio" name="position" value="1" oninput="saveStorey()" />
+                中间位置
+            </label>
+            <label>
+                <input type="radio" name="position" value="2" oninput="saveStorey()" />
+                结尾位置
+            </label>
+            <label>
+                <input type="radio" name="position" value="3" oninput="saveStorey()" />
+                随机位置
+            </label>
             <br>
             <label>
                 <textarea name="nouns" rows="10" class="textarea" oninput="saveStorey()"></textarea>
@@ -115,13 +113,14 @@
                 adjectives: forms.adjectives, 
                 position: forms.position
             })
+            
+            document.querySelector('#words').innerHTML = ''
 
             for (let i = 0, len = words.length; i < len; i++) {
                 const item = words[i]
 
                 const p = document.createElement('p')
                 p.innerText = item
-
                 document.querySelector('#words').appendChild(p)
             }
 
