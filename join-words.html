@@ -26,7 +26,7 @@
                 <div>开头固定词（只能一行）</div>
                 <textarea name="startingWord" rows="6" class="textarea" oninput="saveStorey()"></textarea>
             </label>
-            <div>主词</div>
+            <div>主词1</div>
             <label>
                 <input type="radio" name="position" value="0" checked oninput="saveStorey()" />
                 开头位置
@@ -46,6 +46,23 @@
             <br>
             <label>
                 <textarea name="nouns" rows="10" class="textarea" oninput="saveStorey()"></textarea>
+            </label>
+            <div>主词2（只能一个）</div>
+            <label>
+                <input type="radio" name="position2" value="0" checked oninput="saveStorey()" />
+                主词1后面
+            </label>
+            <label>
+                <input type="radio" name="position2" value="1" oninput="saveStorey()" />
+                结尾位置
+            </label>
+            <label>
+                <input type="radio" name="position2" value="2" oninput="saveStorey()" />
+                随机位置
+            </label>
+            <br>
+            <label>
+                <textarea name="nouns2" rows="10" class="textarea" oninput="saveStorey()"></textarea>
             </label>
             <label>
                 <div>副词</div>
@@ -84,8 +101,10 @@
 
             forms = JSON.parse(forms)
             const positionList = document.querySelectorAll('input[name="position"]')
+            const positionList2 = document.querySelectorAll('input[name="position2"]')
             const startingWord = document.querySelector('textarea[name="startingWord"]');
             const nouns = document.querySelector('textarea[name="nouns"]'); // 主词数组
+            const nouns2 = document.querySelector('textarea[name="nouns2"]'); // 主词数组
             const adjectives = document.querySelector('textarea[name="adjectives"]'); // 副词数组
 
             for (let i = 0, len = positionList.length; i < len; i++) {
@@ -97,8 +116,18 @@
                 }
             }
 
+            for (let i = 0, len = positionList2.length; i < len; i++) {
+                const item = positionList2[i]
+
+                if (item.value == forms.position2) {
+                    item.checked = true
+                    break
+                }
+            }
+
             startingWord.value = forms.startingWord
             nouns.value = forms.nouns.join('\n')
+            nouns2.value = forms.nouns2.join('\n')
             adjectives.value = forms.adjectives.join('\n')
         }
         function saveStorey() {
@@ -111,8 +140,10 @@
                 length: 30,
                 startingWord: forms.startingWord,
                 nouns: forms.nouns,
+                nouns2: forms.nouns2,
                 adjectives: forms.adjectives, 
-                position: forms.position
+                position: forms.position, 
+                position2: forms.position2
             })
 
             document.querySelector('#words').innerHTML = ''
@@ -129,9 +160,12 @@
 
         function getFormValues() {
             let position = 0
+            let position2 = 0
             const positionList = document.querySelectorAll('input[name="position"]')
+            const positionList2 = document.querySelectorAll('input[name="position2"]')
             const startingWord = document.querySelector('textarea[name="startingWord"]');
             const nouns = document.querySelector('textarea[name="nouns"]'); // 主词数组
+            const nouns2 = document.querySelector('textarea[name="nouns2"]'); // 主词数组
             const adjectives = document.querySelector('textarea[name="adjectives"]'); // 副词数组
 
             for (let i = 0, len = positionList.length; i < len; i++) {
@@ -141,12 +175,21 @@
                     break
                 }
             }
+            for (let i = 0, len = positionList2.length; i < len; i++) {
+                const item = positionList2[i]
+                if (item.checked == true) {
+                    position2 = item.value
+                    break
+                }
+            }
 
             return {
                 startingWord: startingWord.value,
                 nouns: nouns.value.split('\n'),
+                nouns2: nouns2.value.split('\n'),
                 adjectives: adjectives.value.split('\n'), 
-                position: parseInt(position)
+                position: parseInt(position),
+                position2: parseInt(position2)
             }
         }
 
@@ -162,9 +205,11 @@
         function generateWordCombination({
             startingWord = '',
             nouns,
+            nouns2,
             adjectives, 
             length, 
-            position = 0
+            position = 0, 
+            position2 = 0
         }) {
             const result = [];
 
@@ -177,6 +222,7 @@
             // 遍历主词数组
             for (let i = 0; i < nouns.length; i++) {
                 const noun = nouns[i];
+                const nouns2Text = (nouns2 && nouns2[0]) || ''
 
                 // 深拷贝副词数组
                 const availableAdjectives = adjectives.slice();
@@ -208,6 +254,37 @@
                 }
 
                 const startingWordLen = startingWord.length
+
+                // 根据指定位置拼接副词
+                switch (position2) {
+                    case 0:  // 主词1后面
+                        word = startingWord + nouns2Text + word.slice(0, length - nouns2Text.length - startingWordLen);
+                        break;
+                    case 1: // 结尾位置
+                        word = startingWord + word.slice(0, length - nouns2Text.length - startingWordLen) + nouns2Text;
+                        break;
+                    case 2: // 随机位置
+                        const randomIndex = Math.floor(Math.random() * concatenatedAdjectives.length);
+
+                        let startArr = concatenatedAdjectives.slice().splice(0, randomIndex)
+                        let endArr = concatenatedAdjectives.slice().slice(randomIndex, concatenatedAdjectives.length)
+                        let startText = startArr.join('')
+                        let endText = endArr.join('')
+
+                        let spilthLen = concatenatedAdjectives.join('').length - length
+
+                        if (endText.length > nouns2Text.length + startingWordLen) {
+                            endText = endText.slice(0, endText.length - nouns2Text.length - spilthLen - startingWordLen)
+                        } else {
+                            startText = startText.slice(0, startText.length - nouns2Text.length - spilthLen - startingWordLen)
+                        }
+
+                        // 拼接主词和副词数组中的剩余副词
+                        word = startingWord + startText + nouns2Text + endText;
+                        break;
+                    default:
+                        break;
+                }
 
                 // 根据指定位置拼接副词
                 switch (position) {
